@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "9SI/iVLCZgUwaLEXONTO0FBB2KWxTsyuRZkrA5FLxEpnJlF4MwR0/t9EQXbJ2wdnqf80XmLNUfUkUK2lOeTqVA==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\User7\\source\\repos\\UploadFilesToYD\\UploadFilesToYD\\UploadFilesToYD.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\User7\\.nuget\\packages\\newtonsoft.json\\12.0.3\\newtonsoft.json.12.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}
