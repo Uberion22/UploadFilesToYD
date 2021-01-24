@@ -33,12 +33,20 @@ namespace UploadFilesToYD
             {
                 // ищем все файлы в директории(в том числе вложенные) 
                 string[] files = Directory.GetFiles(@localFileDirectory, "*.*", SearchOption.AllDirectories);
-                PrintMessage("Получение списка файлов  в каталоге", ConsoleColor.White);
+                PrintMessage($"В каталоге {localFileDirectory} найдены файлы, пытаемся выгрузить", ConsoleColor.White);
+                var cursorPosY =Console.CursorTop;
                 
-                for(int i = 0; i < files.Length; i++)
+                // Выводим список всех найденных файлов
+                for (int i = 0; i < files.Length; i++)
                 {
                     var fileName = files[i].Remove(0, localFileDirectory.Length);
-                    UploadAsync(files[i], fileName, diskDirectory);
+                    PrintMessage($"File {fileName}: found, trying to upload", ConsoleColor.Yellow);
+                }
+                // создаем асинхоронные загрузки найденных файлов
+                for (int i = 0; i < files.Length; i++)
+                {
+                    var fileName = files[i].Remove(0, localFileDirectory.Length);
+                    UploadAsync(files[i], fileName, diskDirectory, i + cursorPosY);
                 }
             }
             catch (Exception ex)
@@ -53,9 +61,10 @@ namespace UploadFilesToYD
         /// <param name="localAddress">Ссылка на полный адрес файла хранящегося на ПК. </param>
         /// <param name="localFileName"> Имя файла на ПК.</param>
         /// <param name="diskDir">Путь сохранения файла на Яндекс Диске.</param>
-        public static async void UploadAsync(string localAddress, string localFileName, string diskDir)
+        /// <param name="cursorPositionY"> Номер строки выводимого сообщения.</param>
+        public static async void UploadAsync(string localAddress, string localFileName, string diskDir, int cursorPositionY)
         {
-            await Task.Run(() => UploadToUrl(localAddress, localFileName, diskDir));
+            await Task.Run(() => UploadToUrl(localAddress, localFileName, diskDir, true, cursorPositionY ));
         }
 
         /// <summary>
@@ -88,7 +97,6 @@ namespace UploadFilesToYD
                             string strResponse = reader.ReadToEnd();
                             JObject response = JObject.Parse(strResponse);
                             url = (string)response.SelectToken("href");// выбор ссылки на URL(загрузки) по ключу
-                            PrintMessage($"Place reserved: {fileName}", ConsoleColor.Blue);
                         }
                     }
                 }
@@ -108,18 +116,17 @@ namespace UploadFilesToYD
         /// <param name="localFileNameWithPath">Адрес локального файла включающий его имя.</param>
         /// <param name="diskDir">Путь к папке на Яндекс Диске.</param>
         /// <param name="overwrite"> Пометка на перезапись файлов с одинаковми именами.</param>
-        public static void UploadToUrl(string fileName, string localFileNameWithPath, string diskDir = "", bool overwrite = true)
+        /// <param name="cursorPositionY"> Номер строки выводимого сообщения.</param>
+        public static void UploadToUrl(string localFileNameWithPath, string fileName, string diskDir = "", bool overwrite = true, int cursorPositionY = 0)
         {
             try
             {
-                var diskPath = GetUploadUrl(localFileNameWithPath, overwrite, diskDir);
-                
+                var diskPath = GetUploadUrl(fileName, overwrite, diskDir);
                 using (var client = new WebClient())
                 {
-                    PrintMessage($"File {localFileNameWithPath}: Upload started!", ConsoleColor.Yellow);
                     // Метод API не возвращает ответ, по этой причине не обрабатывается статус операции.
-                    var response = client.UploadFile(diskPath, fileName);
-                    PrintMessage($"File {localFileNameWithPath} Uploaded!", ConsoleColor.Green);
+                    var response = client.UploadFile(diskPath, localFileNameWithPath);
+                    WriteMessageOnPosition("Upload finished!", fileName.Length + 14, cursorPositionY, ConsoleColor.Green);
                 }
             }
             catch (Exception err)
@@ -138,6 +145,27 @@ namespace UploadFilesToYD
             Console.ForegroundColor = color;
             Console.WriteLine(text);
             Console.ResetColor();
+        }
+
+        /// <summary>
+        /// Вывести строковое сообщение в указанной позиции.
+        /// </summary>
+        /// <param name="text"> Текст сообщения. </param>
+        /// <param name="posX"> Позиция сообщения (отступ слева - количество символов). </param>
+        /// <param name="posY"> Позиция сообщения (отступ сверху - количество строк). </param>
+        /// <param name="color">Цвет выводимого сообщения. </param>
+        public static void WriteMessageOnPosition(string text, int posX, int posY, ConsoleColor color)
+        {
+            try
+            {
+                Console.SetCursorPosition(posX, posY);
+                PrintMessage(text, color);
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                Console.Clear();
+                Console.WriteLine(e.Message);
+            }
         }
     }
 }
