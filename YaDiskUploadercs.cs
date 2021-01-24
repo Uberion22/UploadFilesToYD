@@ -6,34 +6,39 @@ using System.Threading.Tasks;
 
 namespace UploadFilesToYD
 {
+    /// <summary>
+    /// Класс выгружает файлы из локальноый директории в указанный каталог на Яндекс Диске. 
+    /// </summary>
     public static class YaDiskUploader
     {
-        //Перед работой с программой нужно указать ключ авторизации для загрузки файлов на Яндекс Диск
-        const string token = "";
-        // API Яндекс Диска для загрузки файлов
-        const string baseUri = "https://cloud-api.yandex.net/v1/disk/resources/upload/";
         /// <summary>
-        /// Метод получает список  файлов хранящихся в указанном каталоге,
-        /// после чего пытается выгрузить каждый найденный файл на Яндекс Диск 
-        /// Метод принимает 2 аргумента : локальный путь к файлам в формате L:\test\folder\ ,
-        /// а так же  путь к папке на Яндекс Диске без учета корневого каталога.
-        /// Чтобы скопировать файлы в папку на Яндекс Диске,
-        /// нужно ввести адрес  конечной папки диска. Пример: "Music/".
-        /// По умолчанию файлы копируются в корневой каталог.
+        /// Перед работой с программой нужно указать ключ авторизации для загрузки файлов на Яндекс Диск
         /// </summary>
-        public static void UploadToDisk(string localFileDirectory = @"L:\test\", string diskDirecrory = "")
+        private const string _token = "";
+        
+        /// <summary>
+        /// API Яндекс Диска для загрузки файлов
+        /// </summary>
+        private const string _baseUri = "https://cloud-api.yandex.net/v1/disk/resources/upload/";
+        
+        /// <summary>
+        /// Получить список  файлов хранящихся в указанном каталоге,
+        /// и создать асинхронные операции выгрузки файлов на Яндекс Диск.
+        /// </summary>
+        /// <param name="localFileDirectory">Локальный путь к файлам в формате "L:\test\folder\".</param>
+        /// <param name="diskDirecrory">Путь к папке на Яндекс Диске без учета корневого каталога. Пример: "Music/".</param>
+        public static void UploadToDisk(string localFileDirectory = @"L:\test\", string diskDirectory = "")
         {
             try
             {
-                // ищем все фалы в директори(в том числе вложенные) 
+                // ищем все файлы в директории(в том числе вложенные) 
                 string[] files = Directory.GetFiles(@localFileDirectory, "*.*", SearchOption.AllDirectories);
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.WriteLine("Получение списка файлов  в каталоге");
-                Console.ResetColor();
-                foreach (var s in files)
+                PrintMessage("Получение списка файлов  в каталоге", ConsoleColor.White);
+                
+                for(int i = 0; i < files.Length; i++)
                 {
-                    var fileName = s.Remove(0, localFileDirectory.Length);
-                    UploadAsync(s, fileName, diskDirecrory);
+                    var fileName = files[i].Remove(0, localFileDirectory.Length);
+                    UploadAsync(files[i], fileName, diskDirectory);
                 }
             }
             catch (Exception ex)
@@ -43,89 +48,96 @@ namespace UploadFilesToYD
         }
 
         /// <summary>
-        /// Метод принимает 3 параметра и создает асинхронную задачу загрузки файла на Яндекс Диск
+        ///  Создать асинхронную задачу загрузки файла на Яндекс Диск.
         /// </summary>
-        /// <param name="LocalAdress">ссылка на полный адрес файла хранящегося на ПК </param>
-        /// <param name="localFileName"> Имя файла</param>
-        /// <param name="diskDir">путь сохранения файла на Яндекс Диске</param>
-        public static async void UploadAsync(string LocalAdress, string localFileName, string diskDir)
+        /// <param name="localAddress">Ссылка на полный адрес файла хранящегося на ПК. </param>
+        /// <param name="localFileName"> Имя файла на ПК.</param>
+        /// <param name="diskDir">Путь сохранения файла на Яндекс Диске.</param>
+        public static async void UploadAsync(string localAddress, string localFileName, string diskDir)
         {
-            await Task.Run(() => UploadToUrl(LocalAdress, localFileName, diskDir));
+            await Task.Run(() => UploadToUrl(localAddress, localFileName, diskDir));
         }
 
         /// <summary>
-        /// Метод формирует запрос к Яндекс Диску с целью получения ссылки для выгрузки локального файла.
+        /// Сформировать запрос к Яндекс Диску с целью получения ссылки для выгрузки локального файла.
         /// При успешном выполнении метод возвращает ссылку.
-        /// Требуется вторизационный ключ. Указан как константа выше.
+        /// Требует авторизационный ключ. Указан как константа выше.
         /// </summary>
-        /// <param name="fileName"> Имя выгружаемого фалйа</param>
+        /// <param name="fileName"> Имя выгружаемого файла.</param>
         /// <param name="overwrite">Пометка на перезапись. При нахождении файлов с одинаковыми названиями,
-        /// файлы храняящиеся на диске заменяюся новыми</param>
-        /// <param name="diskFolder"> конечная директория на диске</param>
-        /// <returns></returns>
-        public static string GetUploadUrl(string fileName = "", bool overwrite = true, string diskFolder = "")
+        /// файлы хранящиеся на диске заменяются новыми.</param>
+        /// <param name="diskDir"> Конечная директория на диске.</param>
+        /// <returns> Возвращает ссылку для выгрузки файла на Яндекс Диск.</returns>
+        public static string GetUploadUrl(string fileName = "", bool overwrite = true, string diskDir = "")
         {
-            string URl = "";
-            var req = WebRequest.Create(new Uri(baseUri + "?path="
-                + "disk:/" + @diskFolder + fileName + "&overwrite=" + overwrite.ToString()));
-            ((HttpWebRequest)req).Accept = "*/*";
-            req.Method = "GET";
+            string url = string.Empty;
+            var request = WebRequest.Create(new Uri(_baseUri + "?path="
+                + "disk:/" + diskDir + fileName + "&overwrite=" + overwrite.ToString()));
             // аваторизационный ключ для работы с диском
-            req.Headers["Authorization"] = string.Format("OAuth {0}", token);
-            ((HttpWebRequest)req).Proxy = null;
+            request.Headers["Authorization"] = string.Format("OAuth {0}", _token);
+            
             try
             {
-                HttpWebResponse myHttpWebResponse = (HttpWebResponse)req.GetResponse();
-                if (myHttpWebResponse.StatusCode == HttpStatusCode.OK)
+                using (var myHttpWebResponse = (HttpWebResponse)request.GetResponse())
                 {
-                    Stream dataStream = myHttpWebResponse.GetResponseStream();
-                    StreamReader reader = new StreamReader(dataStream);
-                    string strResponse = reader.ReadToEnd();
-                    dataStream.Close();
-                    JObject response = JObject.Parse(strResponse);
-                    URl = (string)response.SelectToken("href");// выбор ссылки на URL(загрузки) по ключу
+                    if (myHttpWebResponse.StatusCode == HttpStatusCode.OK)
+                    {
+                        using (var dataStream = myHttpWebResponse.GetResponseStream())
+                        {
+                            StreamReader reader = new StreamReader(dataStream);
+                            string strResponse = reader.ReadToEnd();
+                            JObject response = JObject.Parse(strResponse);
+                            url = (string)response.SelectToken("href");// выбор ссылки на URL(загрузки) по ключу
+                            PrintMessage($"Place reserved: {fileName}", ConsoleColor.Blue);
+                        }
+                    }
                 }
-                Console.ForegroundColor = ConsoleColor.Blue;
-                Console.WriteLine($"Plase reserved: {fileName}");
-                Console.ResetColor();
-                myHttpWebResponse.Close();
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
 
-            return URl;
+            return url;
         }
+
         /// <summary>
-        /// Метод служит для выгрузки файлов на Яндекс Диск с помощью специальной ссылки(полученной от ЯД) 
+        /// Выгрузить файлы на Яндекс Диск с помощью специальной ссылки(полученной от ЯД). 
         /// </summary>
         /// <param name="fileName"> Имя файла</param>
-        /// <param name="localFileNameWithPath">Адрес локального файла включающий его имя</param>
-        /// <param name="diskDir">Путь к папке на Яндекс Диске</param>
-        /// <param name="overwrite"> Пометка на перезапись файлов с одинаковми именами</param>
+        /// <param name="localFileNameWithPath">Адрес локального файла включающий его имя.</param>
+        /// <param name="diskDir">Путь к папке на Яндекс Диске.</param>
+        /// <param name="overwrite"> Пометка на перезапись файлов с одинаковми именами.</param>
         public static void UploadToUrl(string fileName, string localFileNameWithPath, string diskDir = "", bool overwrite = true)
         {
             try
             {
                 var diskPath = GetUploadUrl(localFileNameWithPath, overwrite, diskDir);
-                WebClient client = new WebClient();
-                client.Credentials = CredentialCache.DefaultCredentials;
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine($"File {localFileNameWithPath}: Upload started!");
-                Console.ResetColor();
-                client.UploadFile(diskPath, "POST", fileName);
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine($"File {localFileNameWithPath} Uploaded!");
-                Console.ResetColor();
-                client.Dispose();
+                
+                using (var client = new WebClient())
+                {
+                    PrintMessage($"File {localFileNameWithPath}: Upload started!", ConsoleColor.Yellow);
+                    // Метод API не возвращает ответ, по этой причине не обрабатывается статус операции.
+                    var response = client.UploadFile(diskPath, fileName);
+                    PrintMessage($"File {localFileNameWithPath} Uploaded!", ConsoleColor.Green);
+                }
             }
             catch (Exception err)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(err.Message);
-                Console.ResetColor();
+                PrintMessage(err.Message, ConsoleColor.Red);
             }
+        }
+
+        /// <summary>
+        /// Вывести текст заданного цвета в консоли.
+        /// </summary>
+        /// <param name="text">Текст выводимого сообщения.</param>
+        /// <param name="color"> Цвет сообщения.</param>
+        private static void PrintMessage(string text, ConsoleColor color)
+        {
+            Console.ForegroundColor = color;
+            Console.WriteLine(text);
+            Console.ResetColor();
         }
     }
 }

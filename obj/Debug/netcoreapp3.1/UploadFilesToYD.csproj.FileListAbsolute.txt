@@ -4,12 +4,12 @@ C:\Users\User7\source\repos\UploadFilesToYD\UploadFilesToYD\bin\Debug\netcoreapp
 C:\Users\User7\source\repos\UploadFilesToYD\UploadFilesToYD\bin\Debug\netcoreapp3.1\UploadFilesToYD.runtimeconfig.dev.json
 C:\Users\User7\source\repos\UploadFilesToYD\UploadFilesToYD\bin\Debug\netcoreapp3.1\UploadFilesToYD.dll
 C:\Users\User7\source\repos\UploadFilesToYD\UploadFilesToYD\bin\Debug\netcoreapp3.1\UploadFilesToYD.pdb
+C:\Users\User7\source\repos\UploadFilesToYD\UploadFilesToYD\bin\Debug\netcoreapp3.1\Newtonsoft.Json.dll
 C:\Users\User7\source\repos\UploadFilesToYD\UploadFilesToYD\obj\Debug\netcoreapp3.1\UploadFilesToYD.csprojAssemblyReference.cache
 C:\Users\User7\source\repos\UploadFilesToYD\UploadFilesToYD\obj\Debug\netcoreapp3.1\UploadFilesToYD.AssemblyInfoInputs.cache
 C:\Users\User7\source\repos\UploadFilesToYD\UploadFilesToYD\obj\Debug\netcoreapp3.1\UploadFilesToYD.AssemblyInfo.cs
+C:\Users\User7\source\repos\UploadFilesToYD\UploadFilesToYD\obj\Debug\netcoreapp3.1\UploadFilesToYD.csproj.CoreCompileInputs.cache
+C:\Users\User7\source\repos\UploadFilesToYD\UploadFilesToYD\obj\Debug\netcoreapp3.1\UploadFilesToYD.csproj.CopyComplete
 C:\Users\User7\source\repos\UploadFilesToYD\UploadFilesToYD\obj\Debug\netcoreapp3.1\UploadFilesToYD.dll
 C:\Users\User7\source\repos\UploadFilesToYD\UploadFilesToYD\obj\Debug\netcoreapp3.1\UploadFilesToYD.pdb
 C:\Users\User7\source\repos\UploadFilesToYD\UploadFilesToYD\obj\Debug\netcoreapp3.1\UploadFilesToYD.genruntimeconfig.cache
-C:\Users\User7\source\repos\UploadFilesToYD\UploadFilesToYD\bin\Debug\netcoreapp3.1\Newtonsoft.Json.dll
-C:\Users\User7\source\repos\UploadFilesToYD\UploadFilesToYD\obj\Debug\netcoreapp3.1\UploadFilesToYD.csproj.CoreCompileInputs.cache
-C:\Users\User7\source\repos\UploadFilesToYD\UploadFilesToYD\obj\Debug\netcoreapp3.1\UploadFilesToYD.csproj.CopyComplete
