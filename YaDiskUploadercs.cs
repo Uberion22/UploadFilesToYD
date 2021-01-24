@@ -9,7 +9,7 @@ namespace UploadFilesToYD
     public static class YaDiskUploader
     {
         //Здесь нужно указать ключ авторизации для загрузки файлов на диск
-        const string token = "AgAAAAAcFGEcAADLW2q-SLRT0U_mnlZDN_OQK0U";
+        const string token = "";
         // API Яндекс Диска для загрузки файлов
         const string baseUri = "https://cloud-api.yandex.net/v1/disk/resources/upload/";
         /// <summary>
